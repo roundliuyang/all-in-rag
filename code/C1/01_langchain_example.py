@@ -9,6 +9,7 @@ from langchain_core.vectorstores import InMemoryVectorStore
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_deepseek import ChatDeepSeek
 
+# 从.env 文件中读取配置项并加载到系统环境中
 load_dotenv()
 
 markdown_path = "../../data/C1/markdown/easy-rl-chapter1.md"
@@ -17,19 +18,21 @@ markdown_path = "../../data/C1/markdown/easy-rl-chapter1.md"
 loader = UnstructuredMarkdownLoader(markdown_path)
 docs = loader.load()
 
-# 文本分块
+# 实例化递归字符文本分割器
 text_splitter = RecursiveCharacterTextSplitter()
+# 将长文档分割成适合模型处理的小块
 chunks = text_splitter.split_documents(docs)
 
-# 中文嵌入模型
+# 创建一个中文文本嵌入模型实例，用于将中文文本转换为数值向量，以便在向量数据库中进行相似性搜索
 embeddings = HuggingFaceEmbeddings(
     model_name="BAAI/bge-small-zh-v1.5",
     model_kwargs={'device': 'cpu'},
     encode_kwargs={'normalize_embeddings': True}
 )
   
-# 构建向量存储
+# 使用指定的嵌入模型创建内存向量存储
 vectorstore = InMemoryVectorStore(embeddings)
+# 将分割后的文档块添加到向量存储中
 vectorstore.add_documents(chunks)
 
 # 提示词模板
