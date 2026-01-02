@@ -18,7 +18,7 @@ markdown_path = "../../data/C1/markdown/easy-rl-chapter1.md"
 loader = UnstructuredMarkdownLoader(markdown_path)
 docs = loader.load()
 
-# 实例化递归字符文本分割器
+# 实例化递归字符文本分割器，当不指定参数初始化 RecursiveCharacterTextSplitter() 时，其默认行为旨在最大程度保留文本的语义结构
 text_splitter = RecursiveCharacterTextSplitter()
 # 将长文档分割成适合模型处理的小块
 chunks = text_splitter.split_documents(docs)
@@ -59,8 +59,10 @@ llm = ChatDeepSeek(
 # 用户查询
 question = "文中举了哪些例子？"
 
-# 在向量存储中查询相关文档
+# 使用向量存储的similarity_search方法，根据用户问题在索引中查找最相关的 k个文本块
 retrieved_docs = vectorstore.similarity_search(question, k=3)
+# 准备上下文: 将检索到的多个文本块的页面内容 (doc.page_content) 合并成一个单一的字符串，并使用双换行符 ("\n\n") 分隔各个块，
+# 形成最终的上下文信息 (docs_content) 供大语言模型参考。
 docs_content = "\n\n".join(doc.page_content for doc in retrieved_docs)
 
 answer = llm.invoke(prompt.format(question=question, context=docs_content))
