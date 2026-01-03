@@ -15,6 +15,10 @@ def send_messages(messages, tools=None):
         tools=tools,
         tool_choice="auto",  # 让模型自主决定是否调用工具
     )
+    # response.choices[0]：获取响应中第一个候选答案（通常只有一个）
+    # .message：获取消息对象，其中包含：
+    #   • content：模型的实际回复文本
+    #   • tool_calls：如果有工具调用，包含调用信息
     return response.choices[0].message
 
 # 1. 定义工具（函数）的 Schema
@@ -43,7 +47,7 @@ messages = [{"role": "user", "content": "杭州今天天气怎么样？"}]
 print(f"User> {messages[0]['content']}\n")
 message = send_messages(messages, tools=tools)
 
-# 2. 执行工具，并将结果返回模型
+# 2. message.tool_calls 是一个包含工具调用信息的列表，if message.tool_calls: 检查这个列表是否非空
 if message.tool_calls:
     print("--- 模型发起了工具调用 ---")
     tool_call = message.tool_calls[0]

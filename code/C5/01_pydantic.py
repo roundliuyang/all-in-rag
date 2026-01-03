@@ -13,14 +13,15 @@ llm = ChatDeepSeek(
 
 # 1. 定义数据结构
 class PersonInfo(BaseModel):
+    """用于存储个人信息的数据结构。"""
     name: str = Field(description="人物姓名")
     age: int = Field(description="人物年龄")
     skills: List[str] = Field(description="技能列表")
 
-# 2. 创建解析器
+# 2. 基于 Pydantic 模型，创建解析器
 parser = PydanticOutputParser(pydantic_object=PersonInfo)
 
-# 3. 创建提示模板
+# 3. 创建提示模板，注入格式指令
 prompt = PromptTemplate(
     template="请根据以下文本提取信息。\n{format_instructions}\n{text}\n",
     input_variables=["text"],
